@@ -4,7 +4,7 @@ echo "Starting to search for PDF files in the filesystem..."
 setopt EXTENDED_GLOB
 
 cd ~
-pdfs=( **/*.pdf(.N) )
+pdfs=( ~/**/*.pdf(.N) )
 
 num_pdfs=${#pdfs[@]}
 
