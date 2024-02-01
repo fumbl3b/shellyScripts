@@ -1,8 +1,10 @@
 #!/bin/zsh
 
 echo "Starting to search for PDF files in the filesystem..."
+setopt EXTENDED_GLOB
 
-pdfs=($(find ~/ -type f -name '*.pdf' ! '*/Library/*' 2>/dev/null))
+cd ~
+pdfs=( **/*.pdf(.N) )
 
 num_pdfs=${#pdfs[@]}
 
@@ -13,12 +15,19 @@ else
     read answer
     if [[ $answer =~ ^[Yy]$ ]]; then
         mkdir -p pdfs_i_found_for_you
+        counter=0
         for file in "${pdfs[@]}"; do
-            echo "Copying $file to the current directory..."
-            cp "$file" ./pdfs_i_found_for_you
+            let counter++
+            echo "Copying $file to '~/pdfs_i_found_for_you'..."
+            cp "$file" ~/pdfs_i_found_for_you/
+            echo "Done ($counter/$num_pdfs)"
+            # progress indicator
+            percent=$(( $counter * 100 / $num_pdfs))
+            printf "\rProgress: [%-50s] %d%% " $(repeat $((percent / 2)) "=") $percent
+
         done
-        echo "Yay! Yippee! All selected PDF files have been copied to the current directory."
+        echo "Yay! Yippee! All selected PDF files have been copied to '~/pdfs_i_found_for_you'."
     else
-        echo "Copy operation aborted :()"
+        echo "Copy operation aborted :("
     fi
 fi
