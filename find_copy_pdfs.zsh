@@ -8,6 +8,12 @@ pdfs=( ~/**/*.pdf(.N) )
 
 num_pdfs=${#pdfs[@]}
 
+output_file="foundPdfs.txt"
+
+for pdf in $pdfs; do
+    echo "$pdf" >> ~/"$output_file"
+done
+
 if [ "$num_pdfs" -eq 0 ]; then
     echo "No PDF files found in the user's home directory."
 else
@@ -17,16 +23,16 @@ else
         mkdir -p pdfs_i_found_for_you
         counter=0
         for file in "${pdfs[@]}"; do
-            let counter++
-            echo "Copying $file to '~/pdfs_i_found_for_you'..."
-            cp "$file" ~/pdfs_i_found_for_you/
-            echo "Done ($counter/$num_pdfs)"
+            (( counter++ ))
+            cp "$file" ~/pdfs_i_found_for_you/ 2>/dev/null
+            
             # progress indicator
             percent=$(( $counter * 100 / $num_pdfs))
-            printf "\rProgress: [%-50s] %d%% " $(repeat $((percent / 2)) "=") $percent
-
+            num_equals=$((percent / 2))
+            progress_bar=$(printf '%*s' "$num_equals" '' | tr ' ' '=')
+            printf "\rProgress: [%-50s] %d%% " "$progress_bar" "$percent"
         done
-        echo "Yay! Yippee! All selected PDF files have been copied to '~/pdfs_i_found_for_you'."
+        echo -e "\n Yay! Yippee! All selected PDF files have been copied to '~/pdfs_i_found_for_you'."
     else
         echo "Copy operation aborted :("
     fi
